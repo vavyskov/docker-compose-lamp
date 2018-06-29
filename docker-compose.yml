@@ -111,6 +111,10 @@ services:
         limits:
           cpus: "0.1"
           memory: 50M
+#  visualizer:
+#    image: dockersamples/visualizer:stable
+#    ports:
+#      - 6666:8080
 
 ## Persist data sinc you are not typing "docker-compose down -v"
 volumes:
