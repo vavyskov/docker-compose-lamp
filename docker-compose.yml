@@ -1,0 +1,119 @@
+##==============================================================================
+## Alpine
+## ------
+## https://medium.com/@jeromegamez/build-your-own-php-docker-image-3c55c9e29b59
+##
+## Multi-stage
+## -----------
+## https://docs.docker.com/develop/develop-images/multistage-build/
+##==============================================================================
+
+
+
+
+
+## docker-compose syntax version
+version: '3'
+
+services:
+  php-ssh:
+    container_name: php-ssh
+    image: vavyskov/php-ssh
+    #image: php:7.0-apache
+    #build:
+      #context: ./config/php-ssh
+      #args:
+        #- SSH_PASSWD=www-data
+        #- WORDPRESS_VERSION=4.9.6
+        #- DRUPAL_VERSION=8.5.4
+    ports:
+      - "80:80"
+      - "2222:22"
+    #extra_hosts:
+    #  - devel.loc:127.0.0.1
+    restart: always
+    volumes:
+      ## (variant A) Use WinSCP+SFTP for sync files on Windows
+      - workspace:/var/www/workspace
+      ## (variant B) - Create local folder "workspace" for sync files on Linux or Mac
+      ## Problem with Apache2 permission on Windows (Drupal)
+      #- ./workspace:/var/www/workspace
+    depends_on:
+      - mariadb
+      - postgres
+  mariadb:
+    container_name: mariadb
+    image: vavyskov/mariadb
+    #image: mariadb
+    #build:
+      #context: ./config/mariadb
+    volumes:
+      - mariadb:/var/lib/mysql
+      ## Local sharing - Create local folder "mariadb"
+      #- ./mariadb:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'no'
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: mariadb
+      MYSQL_PASSWORD: mariadb
+      MYSQL_DATABASE: mariadb
+  postgres:
+    container_name: postgres
+    image: postgres
+    volumes:
+      - postgres:/var/lib/postgres/data
+      ## Local sharing - Create local folder "postgres"
+      #- ./postgres:/var/lib/postgresql/data
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+  adminer:
+    container_name: adminer
+    image: vavyskov/adminer
+    #image: adminer
+    #build:
+      #context: ./config/adminer
+    restart: always
+    ports:
+      - 7777:8080
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 50M
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - 8888:80
+    environment:
+      PMA_HOST: mariadb
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 50M
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - 9999:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin@pgadmin.pgadmin
+      PGADMIN_DEFAULT_PASSWORD: root
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 50M
+
+## Persist data sinc you are not typing "docker-compose down -v"
+volumes:
+  workspace:
+  mariadb:
+  postgres:
