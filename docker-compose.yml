@@ -16,9 +16,9 @@
 version: '3'
 
 services:
-  php-ssh:
-    container_name: php-ssh
-    image: vavyskov/php-ssh
+  php:
+    container_name: php
+    image: vavyskov/php-ssh-smb
     #image: php:7.0-apache
     #build:
       #context: ./config/php-ssh
@@ -29,18 +29,21 @@ services:
     ports:
       - "80:80"
       - "2222:22"
+      - "445:445"
     #extra_hosts:
     #  - devel.loc:127.0.0.1
-    restart: always
     volumes:
-      ## (variant A) Use WinSCP+SFTP for sync files on Windows
-      - workspace:/var/www/workspace
+      ## (variant A) Use WinSCP+SFTP or sshfs or Samba for sync files
+      - workspace:/var/www/html
       ## (variant B) - Create local folder "workspace" for sync files on Linux or Mac
       ## Problem with Apache2 permission on Windows (Drupal)
-      #- ./workspace:/var/www/workspace
+      #- ./workspace:/var/www/html
+      #- ./workspace:/var/www/html:cached
+      #- //c/Users/user/workspace:/var/www/html
     depends_on:
       - mariadb
       - postgres
+    restart: always
   mariadb:
     container_name: mariadb
     image: vavyskov/mariadb
@@ -51,13 +54,13 @@ services:
       - mariadb:/var/lib/mysql
       ## Local sharing - Create local folder "mariadb"
       #- ./mariadb:/var/lib/mysql
-    restart: always
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'no'
       MYSQL_ROOT_PASSWORD: root
       MYSQL_USER: mariadb
       MYSQL_PASSWORD: mariadb
       MYSQL_DATABASE: mariadb
+    restart: always
   postgres:
     container_name: postgres
     image: postgres
@@ -65,18 +68,17 @@ services:
       - postgres:/var/lib/postgres/data
       ## Local sharing - Create local folder "postgres"
       #- ./postgres:/var/lib/postgresql/data
-    restart: always
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
+    restart: always
   adminer:
     container_name: adminer
     image: vavyskov/adminer
     #image: adminer
     #build:
       #context: ./config/adminer
-    restart: always
     ports:
       - 7777:8080
     deploy:
@@ -84,10 +86,10 @@ services:
         limits:
           cpus: "0.1"
           memory: 50M
+    restart: always
   phpmyadmin:
     container_name: phpmyadmin
     image: phpmyadmin/phpmyadmin
-    restart: always
     ports:
       - 8888:80
     environment:
@@ -97,10 +99,10 @@ services:
         limits:
           cpus: "0.1"
           memory: 50M
+    restart: always
   pgadmin:
     container_name: pgadmin
     image: dpage/pgadmin4
-    restart: always
     ports:
       - 9999:80
     environment:
@@ -111,12 +113,14 @@ services:
         limits:
           cpus: "0.1"
           memory: 50M
+    restart: always
 #  visualizer:
 #    image: dockersamples/visualizer:stable
 #    ports:
 #      - 6666:8080
+#   restart: always
 
-## Persist data sinc you are not typing "docker-compose down -v"
+## Persist data until you are not typing "docker-compose down -v"
 volumes:
   workspace:
   mariadb:
