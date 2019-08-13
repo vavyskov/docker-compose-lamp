@@ -54,12 +54,13 @@ services:
       - mariadb:/var/lib/mysql
       ## Local sharing - Create local folder "mariadb"
       #- ./mariadb:/var/lib/mysql
+    env_file: ./.env
     environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'no'
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: mariadb
-      MYSQL_PASSWORD: mariadb
-      MYSQL_DATABASE: mariadb
+      MYSQL_ALLOW_EMPTY_PASSWORD: ${MARIADB_ALLOW_EMPTY_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MARIADB_DATABASE}
+      MYSQL_USER: ${MARIADB_USER}
+      MYSQL_PASSWORD: ${MARIADB_PASSWORD}
     restart: always
   postgres:
     container_name: postgres
@@ -68,10 +69,11 @@ services:
       - postgres:/var/lib/postgres/data
       ## Local sharing - Create local folder "postgres"
       #- ./postgres:/var/lib/postgresql/data
+    env_file: ./.env
     environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     restart: always
   adminer:
     container_name: adminer
@@ -92,8 +94,9 @@ services:
     image: phpmyadmin/phpmyadmin
     ports:
       - 8888:80
+    env_file: ./.env
     environment:
-      PMA_HOST: mariadb
+      PMA_HOST: ${PHPMYADMIN_HOST}
     deploy:
       resources:
         limits:
@@ -105,15 +108,29 @@ services:
     image: dpage/pgadmin4
     ports:
       - 9999:80
+    env_file: ./.env
     environment:
-      PGADMIN_DEFAULT_EMAIL: pgadmin@pgadmin.pgadmin
-      PGADMIN_DEFAULT_PASSWORD: root
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     deploy:
       resources:
         limits:
           cpus: "0.1"
           memory: 50M
     restart: always
+#  mailhog:
+#    image: mailhog/mailhog
+#    labels:
+#      - 'traefik.backend=mailhog'
+#      - 'traefik.port=8025'
+#      - 'traefik.frontend.rule=Host:mailhog.${TRAEFIK_HOST}'
+#  traefik:
+#    image: traefik
+#    command: -c /dev/null --web --docker --logLevel=INFO
+#    ports:
+#      - '9876:80'
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
 #  visualizer:
 #    image: dockersamples/visualizer:stable
 #    ports:
