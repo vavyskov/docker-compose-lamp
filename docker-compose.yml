@@ -77,7 +77,21 @@ services:
      # - ./etc/ssh/sshd_config:/etc/ssh/sshd_config:ro
     ports:
       - "2222:22"
+ #   environment:
+ #     - USERNAME=www-data
+ #     - PASSWORD=www-data
     container_name: "${CONTAINER_SSH_NAME}"
+    restart: always
+  samba:
+    build:
+      context: ./samba
+    networks:
+      - backend
+    volumes:
+      - html:/var/www/html
+    ports:
+      - "445:445"
+    container_name: "${CONTAINER_SAMBA_NAME}"
     restart: always
 networks:
   backend:
