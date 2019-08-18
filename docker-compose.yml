@@ -2,143 +2,86 @@
 ## Alpine
 ## ------
 ## https://medium.com/@jeromegamez/build-your-own-php-docker-image-3c55c9e29b59
+## https://github.com/kreait/docker-images/blob/master/Makefile
 ##
 ## Multi-stage
 ## -----------
 ## https://docs.docker.com/develop/develop-images/multistage-build/
 ##==============================================================================
 
-
-
-
-
-## docker-compose syntax version
-version: '3'
-
+version: "3.2"
 services:
-  php:
-    container_name: php
-    image: vavyskov/php-ssh-smb
-    #image: php:7.0-apache
-    #build:
-      #context: ./config/php-ssh
-      #args:
-        #- SSH_PASSWD=www-data
-        #- WORDPRESS_VERSION=4.9.6
-        #- DRUPAL_VERSION=8.5.4
+  apache:
+    build:
+      context: ./apache
+      args:
+       APACHE_VERSION: ${APACHE_VERSION}
+    depends_on:
+      - php
+      - mariadb
+    networks:
+      - backend
+      - frontend
     ports:
       - "80:80"
-      - "2222:22"
-      - "445:445"
-    #extra_hosts:
-    #  - devel.loc:127.0.0.1
     volumes:
-      ## (variant A) Use WinSCP+SFTP or sshfs or Samba for sync files
-      - workspace:/var/www/html
-      ## (variant B) - Create local folder "workspace" for sync files on Linux or Mac
-      ## Problem with Apache2 permission on Windows (Drupal)
-      #- ./workspace:/var/www/html
-      #- ./workspace:/var/www/html:cached
-      #- //c/Users/user/workspace:/var/www/html
-    depends_on:
-      - mariadb
-      - postgres
-    restart: always
+      #- ./html:/var/www/html
+      - html:/var/www/html
+    container_name: "${CONTAINER_APACHE_NAME}"
+  php:
+    build: 
+      context: ./php
+      args:
+       PHP_VERSION: ${PHP_VERSION}
+    networks:
+      - backend
+    volumes:
+      #- ./html:/var/www/html
+      - html:/var/www/html
+    container_name: "${CONTAINER_PHP_NAME}"
   mariadb:
-    container_name: mariadb
-    image: vavyskov/mariadb
-    #image: mariadb
-    #build:
-      #context: ./config/mariadb
+    image: mariadb:${MARIADB_VERSION:-latest}
+    restart: always
+    ports:
+      - "3306:3306"
     volumes:
-      - mariadb:/var/lib/mysql
-      ## Local sharing - Create local folder "mariadb"
       #- ./mariadb:/var/lib/mysql
-    env_file: ./.env
+      - mariadb:/var/lib/mysql
+    networks:
+      - backend
     environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: ${MARIADB_ALLOW_EMPTY_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MARIADB_DATABASE}
-      MYSQL_USER: ${MARIADB_USER}
-      MYSQL_PASSWORD: ${MARIADB_PASSWORD}
-    restart: always
-  postgres:
-    container_name: postgres
-    image: postgres
-    volumes:
-      - postgres:/var/lib/postgres/data
-      ## Local sharing - Create local folder "postgres"
-      #- ./postgres:/var/lib/postgresql/data
-    env_file: ./.env
-    environment:
-      POSTGRES_DB: ${POSTGRES_DATABASE}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    restart: always
+      MYSQL_ROOT_PASSWORD: "${MARIADB_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${MARIADB_DATABASE}"
+      MYSQL_USER: "${MARIADB_USERNAME}"
+      MYSQL_PASSWORD: "${MARIADB_PASSWORD}"
+    container_name: "${CONTAINER_MARIADB_NAME}"
   adminer:
-    container_name: adminer
-    image: vavyskov/adminer
-    #image: adminer
-    #build:
-      #context: ./config/adminer
+    image: adminer:fastcgi
     ports:
-      - 7777:8080
-    deploy:
-      resources:
-        limits:
-          cpus: "0.1"
-          memory: 50M
+      - "8080:8080"
+    networks:
+      - backend
     restart: always
-  phpmyadmin:
-    container_name: phpmyadmin
-    image: phpmyadmin/phpmyadmin
+    container_name: "${CONTAINER_ADMINER_NAME}"
+  ssh:
+    #image: github.com/chamunks/alpine-openssh
+    #image: vimagick/openssh
+    build:
+      context: ./ssh
+    networks:
+      - backend
+    volumes:
+      - html:/var/www/html
+     #- ./ssh:/data/.ssh:ro
+     ## Uncomment next line if you're bringing your own sshd_config
+     # - ./etc/ssh/sshd_config:/etc/ssh/sshd_config:ro
     ports:
-      - 8888:80
-    env_file: ./.env
-    environment:
-      PMA_HOST: ${PHPMYADMIN_HOST}
-    deploy:
-      resources:
-        limits:
-          cpus: "0.1"
-          memory: 50M
+      - "2222:22"
+    container_name: "${CONTAINER_SSH_NAME}"
     restart: always
-  pgadmin:
-    container_name: pgadmin
-    image: dpage/pgadmin4
-    ports:
-      - 9999:80
-    env_file: ./.env
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-    deploy:
-      resources:
-        limits:
-          cpus: "0.1"
-          memory: 50M
-    restart: always
-#  mailhog:
-#    image: mailhog/mailhog
-#    labels:
-#      - 'traefik.backend=mailhog'
-#      - 'traefik.port=8025'
-#      - 'traefik.frontend.rule=Host:mailhog.${TRAEFIK_HOST}'
-#  traefik:
-#    image: traefik
-#    command: -c /dev/null --web --docker --logLevel=INFO
-#    ports:
-#      - '9876:80'
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#  visualizer:
-#    image: dockersamples/visualizer:stable
-#    ports:
-#      - 6666:8080
-#   restart: always
-
-## Persist data until you are not typing "docker-compose down -v"
+networks:
+  backend:
+  frontend:
 volumes:
-  workspace:
+  html:
   mariadb:
-  postgres:
