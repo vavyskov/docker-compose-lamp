@@ -7,6 +7,10 @@
 ## Multi-stage
 ## -----------
 ## https://docs.docker.com/develop/develop-images/multistage-build/
+##
+## A collection of delicious docker recipes
+## ----------------------------------------
+## https://github.com/vimagick/dockerfiles
 ##==============================================================================
 
 version: "3.2"
@@ -77,9 +81,9 @@ services:
      # - ./etc/ssh/sshd_config:/etc/ssh/sshd_config:ro
     ports:
       - "2222:22"
- #   environment:
- #     - USERNAME=www-data
- #     - PASSWORD=www-data
+    #environment:
+      #- USERNAME=www-data
+      #- PASSWORD=www-data
     container_name: "${CONTAINER_SSH_NAME}"
     restart: always
   samba:
@@ -93,6 +97,17 @@ services:
       - "445:445"
     container_name: "${CONTAINER_SAMBA_NAME}"
     restart: always
+#  ssh-smb:
+#    build:
+#      context: ./ssh-smb
+#    networks:
+#      - backend
+#    volumes:
+#      - html:/var/www/html
+#    ports:
+#      - "2222:22"
+#    container_name: ssh-smb
+#    restart: always
 networks:
   backend:
   frontend:
