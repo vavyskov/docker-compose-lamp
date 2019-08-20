@@ -19,7 +19,7 @@ services:
     build:
       context: ./apache
       args:
-       APACHE_VERSION: ${APACHE_VERSION}
+        APACHE_VERSION: ${APACHE_VERSION}
     depends_on:
       - php
       - mariadb
@@ -29,42 +29,42 @@ services:
     ports:
       - "80:80"
     volumes:
-      #- ./html:/var/www/html
       - html:/var/www/html
+      #- ./html:/var/www/html
     container_name: "${CONTAINER_APACHE_NAME}"
   php:
-    build: 
+    build:
       context: ./php
       args:
-       PHP_VERSION: ${PHP_VERSION}
+        PHP_VERSION: ${PHP_VERSION}
     networks:
       - backend
     volumes:
-      #- ./html:/var/www/html
       - html:/var/www/html
+      #- ./html:/var/www/html
     container_name: "${CONTAINER_PHP_NAME}"
   mariadb:
     image: mariadb:${MARIADB_VERSION:-latest}
-    restart: always
-    ports:
-      - "3306:3306"
-    volumes:
-      #- ./mariadb:/var/lib/mysql
-      - mariadb:/var/lib/mysql
-    networks:
-      - backend
     environment:
       MYSQL_ROOT_PASSWORD: "${MARIADB_ROOT_PASSWORD}"
       MYSQL_DATABASE: "${MARIADB_DATABASE}"
       MYSQL_USER: "${MARIADB_USERNAME}"
       MYSQL_PASSWORD: "${MARIADB_PASSWORD}"
+    networks:
+      - backend
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb:/var/lib/mysql
+      #- ./mariadb:/var/lib/mysql
+    restart: always
     container_name: "${CONTAINER_MARIADB_NAME}"
   adminer:
     image: adminer:fastcgi
-    ports:
-      - "8080:8080"
     networks:
       - backend
+    ports:
+      - "8080:8080"
     restart: always
     container_name: "${CONTAINER_ADMINER_NAME}"
   ssh:
@@ -72,42 +72,31 @@ services:
     #image: vimagick/openssh
     build:
       context: ./ssh
-    networks:
-      - backend
-    volumes:
-      - html:/var/www/html
-     #- ./ssh:/data/.ssh:ro
-     ## Uncomment next line if you're bringing your own sshd_config
-     # - ./etc/ssh/sshd_config:/etc/ssh/sshd_config:ro
-    ports:
-      - "2222:22"
     #environment:
       #- USERNAME=www-data
       #- PASSWORD=www-data
-    container_name: "${CONTAINER_SSH_NAME}"
+    networks:
+      - backend
+    ports:
+      - "2222:22"
+    volumes:
+      - html:/var/www/html
+      #- ./ssh:/data/.ssh:ro
+      ## Uncomment next line if you're bringing your own sshd_config
+      # - ./etc/ssh/sshd_config:/etc/ssh/sshd_config:ro
     restart: always
+    container_name: "${CONTAINER_SSH_NAME}"
   samba:
     build:
       context: ./samba
     networks:
       - backend
-    volumes:
-      - html:/var/www/html
     ports:
       - "445:445"
-    container_name: "${CONTAINER_SAMBA_NAME}"
+    volumes:
+      - html:/var/www/html
     restart: always
-#  ssh-smb:
-#    build:
-#      context: ./ssh-smb
-#    networks:
-#      - backend
-#    volumes:
-#      - html:/var/www/html
-#    ports:
-#      - "2222:22"
-#    container_name: ssh-smb
-#    restart: always
+    container_name: "${CONTAINER_SAMBA_NAME}"
 networks:
   backend:
   frontend:
