@@ -20,4 +20,5 @@ RUN docker-php-ext-install mysqli pdo_mysql \
 &&  apk del git
 
 ## Composer (get path command: which composer)
-COPY --from=composer /usr/bin/composer /usr/bin/composer
+#COPY --from=composer /usr/bin/composer /usr/bin/composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
