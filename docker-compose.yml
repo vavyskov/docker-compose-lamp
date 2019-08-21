@@ -1,4 +1,8 @@
 ##==============================================================================
+## Symfony
+## -------
+## https://sagikazarmark.hu/blog/containerizing-a-symfony-application/
+##
 ## Alpine
 ## ------
 ## https://medium.com/@jeromegamez/build-your-own-php-docker-image-3c55c9e29b59
@@ -16,6 +20,8 @@
 version: "3.2"
 services:
   apache:
+    container_name: ${PROJECT_NAME}-apache
+    #image: vavyskov/apache:alpine
     build:
       context: ./apache
       args:
@@ -31,8 +37,8 @@ services:
     volumes:
       - html:/var/www/html
       #- ./html:/var/www/html
-    container_name: "${CONTAINER_APACHE_NAME}"
   php:
+    container_name: ${PROJECT_NAME}-php
     build:
       context: ./php
       args:
@@ -42,8 +48,8 @@ services:
     volumes:
       - html:/var/www/html
       #- ./html:/var/www/html
-    container_name: "${CONTAINER_PHP_NAME}"
   mariadb:
+    container_name: ${PROJECT_NAME}-mariadb
     image: mariadb:${MARIADB_VERSION:-latest}
     environment:
       MYSQL_ROOT_PASSWORD: "${MARIADB_ROOT_PASSWORD}"
@@ -58,16 +64,16 @@ services:
       - mariadb:/var/lib/mysql
       #- ./mariadb:/var/lib/mysql
     restart: always
-    container_name: "${CONTAINER_MARIADB_NAME}"
   adminer:
+    container_name: ${PROJECT_NAME}-adminer
     image: adminer:fastcgi
     networks:
       - backend
     ports:
       - "8080:8080"
     restart: always
-    container_name: "${CONTAINER_ADMINER_NAME}"
   ssh:
+    container_name: ${PROJECT_NAME}-ssh
     #image: github.com/chamunks/alpine-openssh
     #image: vimagick/openssh
     build:
@@ -85,8 +91,9 @@ services:
       ## Uncomment next line if you're bringing your own sshd_config
       # - ./etc/ssh/sshd_config:/etc/ssh/sshd_config:ro
     restart: always
-    container_name: "${CONTAINER_SSH_NAME}"
   samba:
+    container_name: ${PROJECT_NAME}-samba
+    #image: vavyskov/samba:alpine
     build:
       context: ./samba
     networks:
@@ -96,7 +103,6 @@ services:
     volumes:
       - html:/var/www/html
     restart: always
-    container_name: "${CONTAINER_SAMBA_NAME}"
 networks:
   backend:
   frontend:
