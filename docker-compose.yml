@@ -1,8 +1,4 @@
 ##==============================================================================
-## Symfony
-## -------
-## https://sagikazarmark.hu/blog/containerizing-a-symfony-application/
-##
 ## Alpine
 ## ------
 ## https://medium.com/@jeromegamez/build-your-own-php-docker-image-3c55c9e29b59
@@ -20,7 +16,7 @@
 version: "3.2"
 services:
   apache:
-    container_name: ${PROJECT_NAME}-apache
+    container_name: ${COMPOSE_PROJECT_NAME}_apache
     #image: vavyskov/apache:alpine
     build:
       context: ./apache
@@ -38,7 +34,7 @@ services:
       - html:/var/www/html
       #- ./html:/var/www/html
   php:
-    container_name: ${PROJECT_NAME}-php
+    container_name: ${COMPOSE_PROJECT_NAME}_php
     build:
       context: ./php
       args:
@@ -49,7 +45,7 @@ services:
       - html:/var/www/html
       #- ./html:/var/www/html
   mariadb:
-    container_name: ${PROJECT_NAME}-mariadb
+    container_name: ${COMPOSE_PROJECT_NAME}_mariadb
     image: mariadb:${MARIADB_VERSION:-latest}
     environment:
       MYSQL_ROOT_PASSWORD: "${MARIADB_ROOT_PASSWORD}"
@@ -63,17 +59,16 @@ services:
     volumes:
       - mariadb:/var/lib/mysql
       #- ./mariadb:/var/lib/mysql
-    restart: always
+    #restart: always
   adminer:
-    container_name: ${PROJECT_NAME}-adminer
+    container_name: ${COMPOSE_PROJECT_NAME}_adminer
     image: adminer:fastcgi
     networks:
       - backend
     ports:
       - "8080:8080"
-    restart: always
   ssh:
-    container_name: ${PROJECT_NAME}-ssh
+    container_name: ${COMPOSE_PROJECT_NAME}_ssh
     #image: github.com/chamunks/alpine-openssh
     #image: vimagick/openssh
     build:
@@ -90,9 +85,8 @@ services:
       #- ./ssh:/data/.ssh:ro
       ## Uncomment next line if you're bringing your own sshd_config
       # - ./etc/ssh/sshd_config:/etc/ssh/sshd_config:ro
-    restart: always
   samba:
-    container_name: ${PROJECT_NAME}-samba
+    container_name: ${COMPOSE_PROJECT_NAME}_samba
     #image: vavyskov/samba:alpine
     build:
       context: ./samba
@@ -102,7 +96,6 @@ services:
       - "445:445"
     volumes:
       - html:/var/www/html
-    restart: always
 networks:
   backend:
   frontend:

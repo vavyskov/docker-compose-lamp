@@ -8,12 +8,12 @@ ENV SSH_HOME="/var/www"
 RUN apk add --no-cache \
         openssh-server \
         bash \
-## Add user
-&&  addgroup -g 1000 ${SSH_GROUP} \
-&&  adduser -u 1000 ${SSH_USER} -D -G ${SSH_GROUP} -h ${SSH_HOME} -s /bin/bash \
+## Create user (82 is the standard uid/gid for "www-data" in Alpine)
+&&  addgroup -g 82 ${SSH_GROUP} \
+&&  adduser -u 82 ${SSH_USER} -D -G ${SSH_GROUP} -h ${SSH_HOME} -s /bin/bash \
 &&  echo "${SSH_USER}:${SSH_PASSWORD}" | chpasswd \
-&&  mkdir -p ${SSH_HOME}/html/public \
-&&  chown -R ${SSH_USER}:${SSH_GROUP} ${SSH_HOME} \
+#&&  mkdir -p ${SSH_HOME}/html/public \
+#&&  chown -R ${SSH_USER}:${SSH_GROUP} ${SSH_HOME} \
 ## Prevents unwanted restarting of the container!!!
 &&  ssh-keygen -A
 

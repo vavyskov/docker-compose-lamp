@@ -16,9 +16,9 @@ RUN apk add --no-cache \
         samba-server \
         samba-common-tools \
         supervisor \
-## Create a system user without password, no shell and gid/uid 1000!!!
-&&  addgroup -g 1000 ${SAMBA_GROUP} \
-&&  adduser -u 1000 ${SAMBA_USER} -D -G ${SAMBA_GROUP} -h ${SAMBA_HOME} -s /bin/false \
+## Create user without password, no shell (82 is the standard uid/gid for "www-data" in Alpine)
+&&  addgroup -g 82 ${SAMBA_GROUP} \
+&&  adduser -u 82 ${SAMBA_USER} -D -G ${SAMBA_GROUP} -h ${SAMBA_HOME} -s /bin/false \
 ## Create a samba user
 &&  echo -e "${SAMBA_PASSWORD}\n${SAMBA_PASSWORD}" | smbpasswd -s -a ${SAMBA_USER}
 
