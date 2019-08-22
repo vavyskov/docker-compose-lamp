@@ -1,1 +1,1 @@
-# docker-lamp
+# docker-compose-lamp
