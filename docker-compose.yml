@@ -22,14 +22,18 @@ services:
       context: ./apache
       args:
         APACHE_VERSION: ${APACHE_VERSION}
+    environment:
+      - VIRTUAL_HOST=${COMPOSE_PROJECT_NAME}.local
     depends_on:
       - php
       - mariadb
     networks:
       - backend
       - frontend
-    ports:
-      - "80:80"
+#    ports:
+#      - "8001:80"
+#    expose:
+#      - "80"
     volumes:
       - html:/var/www/html
       #- ./html:/var/www/html
@@ -96,6 +100,17 @@ services:
       - "445:445"
     volumes:
       - html:/var/www/html
+  nginx-proxy:
+    container_name: ${COMPOSE_PROJECT_NAME}_proxy
+    image: jwilder/nginx-proxy:alpine
+    environment:
+      - DEFAULT_HOST=${COMPOSE_PROJECT_NAME}.local
+    ports:
+      - "80:80"
+    networks:
+      - backend
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
 networks:
   backend:
   frontend:

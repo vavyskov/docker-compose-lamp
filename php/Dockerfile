@@ -1,9 +1,12 @@
 ## https://hub.docker.com/r/aexchecker/docker-php/dockerfile/
 ## https://hub.docker.com/r/wodby/drupal-php/dockerfile/
 
-ARG PHP_VERSION=""
+ARG PHP_VERSION=7.2
 
 FROM php:${PHP_VERSION:+${PHP_VERSION}-}fpm-alpine
+
+ENV USER_HOME=/var/www
+ENV DOCUMENT_ROOT=/var/www/html/public
 
 ## PHP extension: MySQL, MariaDB, Percona Server, or equivalent (Wordpress: mysqli, Drupal: pdo_mysqli)
 RUN docker-php-ext-install mysqli pdo_mysql \
@@ -22,3 +25,12 @@ RUN docker-php-ext-install mysqli pdo_mysql \
 ## Composer (get path command: which composer)
 #COPY --from=composer /usr/bin/composer /usr/bin/composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
+
+## Create document root
+RUN mkdir -p "${DOCUMENT_ROOT}"
+
+## Copy default data
+COPY config/public ${DOCUMENT_ROOT}
+
+## Set permission (82 is the standard uid/gid for "www-data" in Alpine)
+RUN chown -R 82:82 ${USER_HOME}

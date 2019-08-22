@@ -5,30 +5,28 @@
 
 FROM alpine
 
-ENV SAMBA_USER=www-data
-ENV SAMBA_PASSWORD=www-data
-ENV SAMBA_GROUP=www-data
-ENV SAMBA_HOME="/var/www"
-#ENV WORKGROUP=VEVVA
-#ENV HOSTNAME=samba
+ENV USER_NAME=www-data
+ENV USER_PASSWORD=www-data
+ENV USER_GROUP=www-data
+ENV USER_HOME=/var/www
 
 RUN apk add --no-cache \
         samba-server \
         samba-common-tools \
         supervisor \
 ## Create user without password, no shell (82 is the standard uid/gid for "www-data" in Alpine)
-&&  addgroup -g 82 ${SAMBA_GROUP} \
-&&  adduser -u 82 ${SAMBA_USER} -D -G ${SAMBA_GROUP} -h ${SAMBA_HOME} -s /bin/false \
+&&  addgroup -g 82 ${USER_GROUP} \
+&&  adduser -u 82 ${USER_NAME} -D -G ${USER_GROUP} -h ${USER_HOME} -s /bin/false \
 ## Create a samba user
-&&  echo -e "${SAMBA_PASSWORD}\n${SAMBA_PASSWORD}" | smbpasswd -s -a ${SAMBA_USER}
-
-## Create shared folder
-#RUN mkdir -p ${SAMBA_HOME}/html; \
-#    chown -R ${SAMBA_USER}:${SAMBA_GROUP} ${SAMBA_HOME}
+&&  echo -e "${USER_PASSWORD}\n${USER_PASSWORD}" | smbpasswd -s -a ${USER_NAME}
 
 ## Samba configuration
 #RUN cp /etc/samba/smb.conf /etc/samba/smb.conf.bak
 COPY config/smb.conf /etc/samba/smb.conf
+
+## Create shared folder
+#RUN mkdir -p ${USER_HOME}/html; \
+#    chown -R ${USER_NAME}:${USER_GROUP} ${USER_HOME}
 
 #VOLUME /var/www/html
 

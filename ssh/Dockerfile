@@ -1,34 +1,40 @@
 FROM alpine
 
-ENV SSH_USER=www-data
-ENV SSH_PASSWORD=www-data
-ENV SSH_GROUP=www-data
-ENV SSH_HOME="/var/www"
+ENV USER_NAME=www-data
+ENV USER_PASSWORD=www-data
+ENV USER_GROUP=www-data
+ENV USER_HOME=/var/www
 
 RUN apk add --no-cache \
         openssh-server \
         bash \
 ## Create user (82 is the standard uid/gid for "www-data" in Alpine)
-&&  addgroup -g 82 ${SSH_GROUP} \
-&&  adduser -u 82 ${SSH_USER} -D -G ${SSH_GROUP} -h ${SSH_HOME} -s /bin/bash \
-&&  echo "${SSH_USER}:${SSH_PASSWORD}" | chpasswd \
-#&&  mkdir -p ${SSH_HOME}/html/public \
-#&&  chown -R ${SSH_USER}:${SSH_GROUP} ${SSH_HOME} \
+&&  addgroup -g 82 ${USER_GROUP} \
+&&  adduser -u 82 ${USER_NAME} -D -G ${USER_GROUP} -h ${USER_HOME} -s /bin/bash \
+&&  echo "${USER_NAME}:${USER_PASSWORD}" | chpasswd \
+#&&  mkdir -p ${USER_HOME}/html/public \
+#&&  chown -R ${USER_NAME}:${USER_GROUP} ${USER_HOME} \
 ## Prevents unwanted restarting of the container!!!
 &&  ssh-keygen -A
 
+## FixMe: Invalid reference format: repository name must be lowercase
+#ENV EXTERNAL_PHP_SOURCE=vavyskov/php:${PHP_VERSION:+${PHP_VERSION}-}fpm-alpine
+#ENV SOURCE_PHP=php:fpm-alpine
+#ENV SOURCE_COMPOSER=composer
+
 ## Php (which php, php -i | grep extension_dir)
 #COPY --from=php:fpm-alpine /usr/local/bin/php /usr/local/bin/php
-COPY --from=dockerlamp_php /usr/local/bin/php /usr/local/bin/php
-COPY --from=dockerlamp_php /usr/lib /usr/lib
+#COPY --from=dockerlamp_php /usr/local/bin/php /usr/local/bin/php
+#COPY --from=dockerlamp_php /usr/lib /usr/lib
+COPY --from=vavyskov/php:7.2-fpm-alpine /usr/local/bin/php /usr/local/bin/php
+COPY --from=vavyskov/php:7.2-fpm-alpine /usr/lib /usr/lib
 
 ## Composer (which composer)
 #COPY --from=composer /usr/bin/composer /usr/bin/composer
-COPY --from=dockerlamp_php /usr/bin/composer /usr/bin/composer
+#COPY --from=dockerlamp_php /usr/bin/composer /usr/bin/composer
+COPY --from=vavyskov/php:7.2-fpm-alpine /usr/bin/composer /usr/bin/composer
 
-#WORKDIR ${SSH_HOME}/html
-
-#VOLUME ${SSH_HOME}/html
+#VOLUME ${USER_HOME}/html
 
 EXPOSE 22
 
