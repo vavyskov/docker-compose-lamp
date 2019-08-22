@@ -1,4 +1,4 @@
-# docker-lamp
+# docker-compose-lamp
 
 Installation:
 1. Docker Toolbox
