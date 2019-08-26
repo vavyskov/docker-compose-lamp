@@ -1,18 +1,3 @@
-##==============================================================================
-## Alpine
-## ------
-## https://medium.com/@jeromegamez/build-your-own-php-docker-image-3c55c9e29b59
-## https://github.com/kreait/docker-images/blob/master/Makefile
-##
-## Multi-stage
-## -----------
-## https://docs.docker.com/develop/develop-images/multistage-build/
-##
-## A collection of delicious docker recipes
-## ----------------------------------------
-## https://github.com/vimagick/dockerfiles
-##==============================================================================
-
 version: "3.2"
 services:
   apache:

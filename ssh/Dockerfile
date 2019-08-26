@@ -3,8 +3,13 @@
 ARG PHP_FROM=vavyskov/php:7.2-fpm-alpine
 ARG COMPOSER_FROM=vavyskov/php:7.2-fpm-alpine
 
-FROM ${PHP_FROM} AS php
-FROM ${COMPOSER_FROM} AS composer
+FROM ${PHP_FROM:-alpine} AS php
+RUN test -f /usr/local/bin/php || mkdir -p /usr/local/bin/php \
+&&  test -d /usr/lib || mkdir -p /usr/lib
+
+FROM ${COMPOSER_FROM:-alpine} AS composer
+RUN test -f /usr/bin/composer || mkdir -p /usr/bin/composer
+
 FROM alpine
 
 ENV USER_NAME=www-data
