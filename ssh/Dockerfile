@@ -1,7 +1,9 @@
 ## Multi-stage builds
 
-ARG PHP_FROM=vavyskov/php:7.2-fpm-alpine
-ARG COMPOSER_FROM=vavyskov/php:7.2-fpm-alpine
+ARG PHP_FROM=
+ARG COMPOSER_FROM=
+#ARG PHP_FROM=vavyskov/php:7.2-fpm-alpine
+#ARG COMPOSER_FROM=vavyskov/php:7.2-fpm-alpine
 
 FROM ${PHP_FROM:-alpine} AS php
 RUN test -f /usr/local/bin/php || mkdir -p /usr/local/bin/php \
