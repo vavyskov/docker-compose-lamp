@@ -1,9 +1,5 @@
-#docker build --build-arg PHP_FROM=vavyskov/php:7.2-fpm-alpine COMPOSER_FROM=vavyskov/php:7.2-fpm-alpine  -t vavyskov/ssh:vavyskov-php-7.2-fpm-alpine .
-##docker run -d vavyskov/ssh:vavyskov-php-7.2-fpm-alpine
-​​​​​##docker exec -it <CONTAINER ID> sh
+#docker build --build-arg PHP_FROM=vavyskov/php:7.2-fpm-alpine --build-arg COMPOSER_FROM=vavyskov/php:7.2-fpm-alpine  -t vavyskov/ssh:vavyskov-php-7.2-fpm-alpine .
 #docker push vavyskov/ssh:vavyskov-php-7.2-fpm-alpine
 
-#docker build --build-arg PHP_FROM=vavyskov/php:7.2-fpm-alpine COMPOSER_FROM=vavyskov/php:7.2-fpm-alpine  -t vavyskov/ssh:vavyskov-php-7.2-fpm-alpine .
-##docker run -d vavyskov/ssh:vavyskov-php-7.2-fpm-alpine
-​​​​​##docker exec -it <CONTAINER ID> sh
+#docker build --build-arg PHP_FROM=vavyskov/php:7.2-fpm-alpine --build-arg COMPOSER_FROM=vavyskov/php:7.2-fpm-alpine  -t vavyskov/ssh:vavyskov-php-7.2-fpm-alpine .
 #docker push vavyskov/ssh:vavyskov-php-7.2-fpm-alpine
