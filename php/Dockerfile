@@ -9,17 +9,21 @@ ENV USER_HOME=/var/www
 ENV DOCUMENT_ROOT=/var/www/html/public
 
 ## PHP extension: MySQL, MariaDB, Percona Server, or equivalent (Wordpress: mysqli, Drupal: pdo_mysqli)
-RUN docker-php-ext-install mysqli pdo_mysql \
+RUN docker-php-ext-install mysqli pdo_mysql
+
 ## PHP extension: opcache
-&&  docker-php-ext-install opcache \
+RUN docker-php-ext-install opcache
+
 ## PHP extension: gd (next librarires: libjpeg-turbo-dev libwebp-dev zlib-dev libxpm-dev)
-&&  apk add --no-cache libpng libpng-dev \
+RUN apk add --no-cache libpng libpng-dev \
 &&  docker-php-ext-install gd \
-&&  apk del libpng-dev \
+&&  apk del libpng-dev
+
 ## PHP extension: PECL uploadprogress
-&&  apk add --no-cache git \
+RUN apk add --no-cache git \
 &&  git clone https://github.com/php/pecl-php-uploadprogress/ /usr/src/php/ext/uploadprogress/ \
 &&  docker-php-ext-install uploadprogress \
+&&  rm -fr /usr/src/php/ext/uploadprogress \
 &&  apk del git
 
 ## Composer (get path command: which composer)

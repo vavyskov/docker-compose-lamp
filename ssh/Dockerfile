@@ -8,13 +8,7 @@ ENV USER_HOME=/var/www
 RUN apk add --no-cache \
         openssh-server \
         bash \
-## Create user (82 is the standard uid/gid for "www-data" in Alpine)
-&&  addgroup -g 82 ${USER_GROUP} \
-&&  adduser -u 82 ${USER_NAME} -D -G ${USER_GROUP} -h ${USER_HOME} -s /bin/bash \
-&&  echo "${USER_NAME}:${USER_PASSWORD}" | chpasswd \
-#&&  mkdir -p ${USER_HOME}/html/public \
-#&&  chown -R ${USER_NAME}:${USER_GROUP} ${USER_HOME} \
-## Prevents unwanted restarting of the container!!!
+## Prevents unwanted restarting of the container (when using the docker-compose.yml)
 &&  ssh-keygen -A
 
 ## FixMe: Invalid reference format: repository name must be lowercase
@@ -35,6 +29,11 @@ COPY --from=vavyskov/php:7.2-fpm-alpine /usr/lib /usr/lib
 COPY --from=vavyskov/php:7.2-fpm-alpine /usr/bin/composer /usr/bin/composer
 
 #VOLUME ${USER_HOME}/html
+
+## Initialize container
+COPY config/entrypoint.sh /usr/local/bin/
+RUN chmod u+x /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["entrypoint.sh"]
 
 EXPOSE 22
 
