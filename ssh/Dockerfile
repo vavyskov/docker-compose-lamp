@@ -1,3 +1,10 @@
+## Multi-stage builds
+
+ARG PHP_FROM=vavyskov/php:7.2-fpm-alpine
+ARG COMPOSER_FROM=vavyskov/php:7.2-fpm-alpine
+
+FROM ${PHP_FROM} AS php
+FROM ${COMPOSER_FROM} AS composer
 FROM alpine
 
 ENV USER_NAME=www-data
@@ -11,22 +18,12 @@ RUN apk add --no-cache \
 ## Prevents unwanted restarting of the container (when using the docker-compose.yml)
 &&  ssh-keygen -A
 
-## FixMe: Invalid reference format: repository name must be lowercase
-#ENV EXTERNAL_PHP_SOURCE=vavyskov/php:${PHP_VERSION:+${PHP_VERSION}-}fpm-alpine
-#ENV SOURCE_PHP=php:fpm-alpine
-#ENV SOURCE_COMPOSER=composer
+## Php (get path command: which php, php -i | grep extension_dir)
+COPY --from=php /usr/local/bin/php /usr/local/bin/php
+COPY --from=php /usr/lib /usr/lib
 
-## Php (which php, php -i | grep extension_dir)
-#COPY --from=php:fpm-alpine /usr/local/bin/php /usr/local/bin/php
-#COPY --from=dockerlamp_php /usr/local/bin/php /usr/local/bin/php
-#COPY --from=dockerlamp_php /usr/lib /usr/lib
-COPY --from=vavyskov/php:7.2-fpm-alpine /usr/local/bin/php /usr/local/bin/php
-COPY --from=vavyskov/php:7.2-fpm-alpine /usr/lib /usr/lib
-
-## Composer (which composer)
-#COPY --from=composer /usr/bin/composer /usr/bin/composer
-#COPY --from=dockerlamp_php /usr/bin/composer /usr/bin/composer
-COPY --from=vavyskov/php:7.2-fpm-alpine /usr/bin/composer /usr/bin/composer
+## Composer (get path command: which composer)
+COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 #VOLUME ${USER_HOME}/html
 

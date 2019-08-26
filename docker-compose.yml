@@ -24,8 +24,8 @@ services:
         APACHE_VERSION: ${APACHE_VERSION}
     environment:
       VIRTUAL_HOST: ${COMPOSE_PROJECT_NAME}.local
-      USER_HOME: ${USER_HOME}
-      DOCUMENT_ROOT: ${DOCUMENT_ROOT}
+      #USER_HOME: ${USER_HOME}
+      #DOCUMENT_ROOT: ${DOCUMENT_ROOT}
     depends_on:
       - php
       - mariadb
@@ -46,9 +46,9 @@ services:
       context: ./php
       args:
         PHP_VERSION: ${PHP_VERSION}
-    environment:
-      USER_HOME: ${USER_HOME}
-      DOCUMENT_ROOT: ${DOCUMENT_ROOT}
+    #environment:
+    #  USER_HOME: ${USER_HOME}
+    #  DOCUMENT_ROOT: ${DOCUMENT_ROOT}
     networks:
       - backend
     volumes:
@@ -85,8 +85,9 @@ services:
 #    image: ssh
     build:
       context: ./ssh
-      #args:
-      #  USER_PASSWORD: www
+      args:
+        PHP_FROM: ${SSH_PHP_FROM}
+        COMPOSER_FROM: ${SSH_COMPOSER_FROM}
     environment:
       USER_NAME: ${USER_NAME}
       USER_PASSWORD: ${USER_PASSWORD}
