@@ -2,11 +2,11 @@ version: "3.2"
 services:
   apache:
     container_name: ${COMPOSE_PROJECT_NAME}_apache
-#    image: vavyskov/apache:alpine
-    build:
-      context: ./apache
-      args:
-        APACHE_VERSION: ${APACHE_VERSION}
+    image: vavyskov/apache:alpine
+#    build:
+#      context: ./apache
+#      args:
+#        APACHE_VERSION: ${APACHE_VERSION}
     environment:
       VIRTUAL_HOST: ${COMPOSE_PROJECT_NAME}.local
       #USER_HOME: ${USER_HOME}
@@ -19,18 +19,18 @@ services:
       - frontend
     ports:
       - "8001:80"
-    expose:
-      - "80"
+    #expose:
+    #  - "80"
     volumes:
       - html:/var/www/html
       #- ./html:/var/www/html
   php:
     container_name: ${COMPOSE_PROJECT_NAME}_php
-#    image: vavyskov/php:7.2-fpm-alpine
-    build:
-      context: ./php
-      args:
-        PHP_VERSION: ${PHP_VERSION}
+    image: vavyskov/php:7.2-fpm-alpine
+#    build:
+#      context: ./php
+#      args:
+#        PHP_VERSION: ${PHP_VERSION}
     #environment:
     #  USER_HOME: ${USER_HOME}
     #  DOCUMENT_ROOT: ${DOCUMENT_ROOT}
@@ -64,15 +64,12 @@ services:
       - "8080:8080"
   ssh:
     container_name: ${COMPOSE_PROJECT_NAME}_ssh
-    #image: github.com/chamunks/alpine-openssh
-    #image: vimagick/openssh
-#    image: vavyskov/ssh:vavyskov-php-7.2-fpm-alpine
-#    image: ssh
-    build:
-      context: ./ssh
-      args:
-        PHP_FROM: ${SSH_PHP_FROM}
-        COMPOSER_FROM: ${SSH_COMPOSER_FROM}
+    image: vavyskov/ssh:vavyskov-php-7.2-fpm-alpine
+#    build:
+#      context: ./ssh
+#      args:
+#        PHP_FROM: ${SSH_PHP_FROM}
+#        COMPOSER_FROM: ${SSH_COMPOSER_FROM}
     environment:
       USER_NAME: ${USER_NAME}
       USER_PASSWORD: ${USER_PASSWORD}
@@ -81,7 +78,7 @@ services:
     networks:
       - backend
     ports:
-      - "2222:22"
+      - "2201:22"
     volumes:
       - html:/var/www/html
       #- ./ssh:/data/.ssh:ro
@@ -89,9 +86,9 @@ services:
       # - ./etc/ssh/sshd_config:/etc/ssh/sshd_config:ro
   samba:
     container_name: ${COMPOSE_PROJECT_NAME}_samba
-    #image: vavyskov/samba:alpine
-    build:
-      context: ./samba
+    image: vavyskov/samba:alpine
+#    build:
+#      context: ./samba
     environment:
       USER_NAME: ${USER_NAME}
       USER_PASSWORD: ${USER_PASSWORD}
@@ -100,7 +97,7 @@ services:
     networks:
       - backend
     ports:
-      - "445:445"
+      - "4451:445"
     volumes:
       - html:/var/www/html
   nginx-proxy:
