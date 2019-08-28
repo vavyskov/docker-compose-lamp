@@ -38,3 +38,8 @@ COPY config/public ${DOCUMENT_ROOT}
 
 ## Set permission (82 is the standard uid/gid for "www-data" in Alpine)
 RUN chown -R 82:82 ${USER_HOME}
+
+## Sendmail
+RUN apk add --no-cache ssmtp \
+&&  echo 'sendmail_path = /usr/sbin/ssmtp -t' > /usr/local/etc/php/conf.d/mail.ini
+COPY config/ssmtp.conf /etc/ssmtp

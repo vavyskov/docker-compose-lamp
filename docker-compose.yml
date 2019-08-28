@@ -34,6 +34,9 @@ services:
     #environment:
     #  USER_HOME: ${USER_HOME}
     #  DOCUMENT_ROOT: ${DOCUMENT_ROOT}
+    hostname: ${COMPOSE_PROJECT_NAME}.local
+    depends_on:
+      - mailcatcher
     networks:
       - backend
     volumes:
@@ -111,6 +114,17 @@ services:
       - backend
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
+  mailcatcher:
+    container_name: ${COMPOSE_PROJECT_NAME}_mailcatcher
+    image: vavyskov/mailcatcher
+    #build:
+    #  context: ./mailcatcher
+    networks:
+      - backend
+    ports:
+      - "1080:80"
+      - "1025:25"
+    #restart: on-failure:10
 networks:
   backend:
   frontend:
