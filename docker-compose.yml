@@ -125,6 +125,19 @@ services:
       - "1080:80"
       - "1025:25"
     #restart: on-failure:10
+#  visualizer:
+#    image: dockersamples/visualizer:stable
+#    networks:
+#      - backend
+#    ports:
+#      - 7777:8080
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock:ro
+    #restart: always
+#    stop_grace_period: 1m30s
+    #deploy:
+    #  placement:
+    #    constraints: [node.role==manager]
 networks:
   backend:
   frontend:
