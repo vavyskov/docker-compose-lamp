@@ -2,7 +2,7 @@ version: "3.2"
 services:
   apache:
     container_name: ${COMPOSE_PROJECT_NAME}_apache
-    image: vavyskov/apache:alpine
+    image: vavyskov/apache:alpine3.10
 #    build:
 #      context: ./apache
 #      args:
@@ -89,7 +89,7 @@ services:
       # - ./etc/ssh/sshd_config:/etc/ssh/sshd_config:ro
   samba:
     container_name: ${COMPOSE_PROJECT_NAME}_samba
-    image: vavyskov/samba:alpine
+    image: vavyskov/samba:alpine3.10
 #    build:
 #      context: ./samba
     environment:
