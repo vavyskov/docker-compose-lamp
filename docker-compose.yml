@@ -26,7 +26,7 @@ services:
       #- ./html:/var/www/html
   php:
     container_name: ${COMPOSE_PROJECT_NAME}_php
-    image: vavyskov/php:7.2-fpm-alpine
+    image: vavyskov/php:${PHP_VERSION}-fpm-alpine
 #    build:
 #      context: ./php
 #      args:
@@ -67,7 +67,7 @@ services:
       - "8080:8080"
   ssh:
     container_name: ${COMPOSE_PROJECT_NAME}_ssh
-    image: vavyskov/ssh:vavyskov-php-7.2-fpm-alpine
+    image: vavyskov/ssh:vavyskov-php-${PHP_VERSION}-fpm-alpine
 #    build:
 #      context: ./ssh
 #      args:
