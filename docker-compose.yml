@@ -2,7 +2,7 @@ version: "3.2"
 services:
   apache:
     container_name: ${COMPOSE_PROJECT_NAME}_apache
-    image: vavyskov/apache:alpine3.10
+    image: vavyskov/apache:alpine
 #    build:
 #      context: ./apache
 #      args:
@@ -26,9 +26,9 @@ services:
       #- ./html:/var/www/html
   php:
     container_name: ${COMPOSE_PROJECT_NAME}_php
-    image: vavyskov/php:${PHP_VERSION}-fpm-alpine
+    image: vavyskov/php:${PHP_VERSION}-fpm-alpine3.10
 #    build:
-#      context: ./php
+#      context: ../docker-php/alpine3.10/fpm
 #      args:
 #        PHP_VERSION: ${PHP_VERSION}
     #environment:
@@ -67,7 +67,7 @@ services:
       - "8080:8080"
   ssh:
     container_name: ${COMPOSE_PROJECT_NAME}_ssh
-    image: vavyskov/ssh:vavyskov-php-${PHP_VERSION}-fpm-alpine
+    image: vavyskov/ssh:vavyskov-php-${PHP_VERSION}-fpm-alpine3.10
 #    build:
 #      context: ./ssh
 #      args:
