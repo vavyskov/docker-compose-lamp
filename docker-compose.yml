@@ -2,7 +2,7 @@ version: "3.2"
 services:
   apache:
     container_name: ${COMPOSE_PROJECT_NAME}_apache
-    image: vavyskov/apache:alpine
+    image: vavyskov/apache:alpine3.10
 #    build:
 #      context: ./apache
 #      args:
