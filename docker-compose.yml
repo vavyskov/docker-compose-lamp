@@ -17,15 +17,28 @@ version: '3'
 
 services:
   php:
-    container_name: php
+    container_name: ${COMPOSE_PROJECT_NAME}_php
+##    image: vavyskov/php:${PHP_VERSION}-apache-stretch
+##    image: vavyskov/php-ssh:${PHP_VERSION}-apache-stretch
     image: vavyskov/php-ssh-smb
     #image: php:7.0-apache
     #build:
       #context: ./config/php-ssh
+      #context: ../docker-php-ssh/stretch/apache
       #args:
+        #- PHP_VERSION: ${PHP_VERSION}
         #- SSH_PASSWD=www-data
         #- WORDPRESS_VERSION=4.9.6
         #- DRUPAL_VERSION=8.5.4
+    environment:
+      VIRTUAL_HOST: ${COMPOSE_PROJECT_NAME}.local
+    hostname: ${COMPOSE_PROJECT_NAME}.local
+    depends_on:
+      - mariadb
+      - postgres
+#    networks:
+#      - backend
+#      - frontend
     ports:
       - "80:80"
       - "2222:22"
@@ -40,13 +53,10 @@ services:
       #- ./workspace:/var/www/html
       #- ./workspace:/var/www/html:cached
       #- //c/Users/user/workspace:/var/www/html
-    depends_on:
-      - mariadb
-      - postgres
     restart: always
   mariadb:
-    container_name: mariadb
-    image: vavyskov/mariadb
+    container_name: ${COMPOSE_PROJECT_NAME}_mariadb
+    image: mariadb:${MARIADB_VERSION:-latest}
     #image: mariadb
     #build:
       #context: ./config/mariadb
@@ -61,10 +71,14 @@ services:
       MYSQL_DATABASE: ${MARIADB_DATABASE}
       MYSQL_USER: ${MARIADB_USER}
       MYSQL_PASSWORD: ${MARIADB_PASSWORD}
+#    networks:
+#      - backend
+#    ports:
+#      - "33062:3306"
     restart: always
   postgres:
-    container_name: postgres
-    image: postgres
+    container_name: ${COMPOSE_PROJECT_NAME}_postgres
+    image: postgres:${POSTGRES_VERSION:-latest}
     volumes:
       - postgres:/var/lib/postgres/data
       ## Local sharing - Create local folder "postgres"
@@ -76,9 +90,12 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     restart: always
   adminer:
-    container_name: adminer
+    container_name: ${COMPOSE_PROJECT_NAME}_adminer
+#    image: adminer:fastcgi
     image: vavyskov/adminer
     #image: adminer
+#    networks:
+#      - backend
     #build:
       #context: ./config/adminer
     ports:
@@ -118,12 +135,63 @@ services:
           cpus: "0.1"
           memory: 50M
     restart: always
+#  mailcatcher:
+#    container_name: ${COMPOSE_PROJECT_NAME}_mailcatcher
+#    image: vavyskov/mailcatcher
+    #build:
+    #  context: ./mailcatcher
+#    networks:
+#      - backend
+#    ports:
+#      - "1080:80"
+#      - "1025:25"
 #  mailhog:
 #    image: mailhog/mailhog
 #    labels:
 #      - 'traefik.backend=mailhog'
 #      - 'traefik.port=8025'
 #      - 'traefik.frontend.rule=Host:mailhog.${TRAEFIK_HOST}'
+#  ssh:
+#    container_name: ${COMPOSE_PROJECT_NAME}_ssh
+#    image: vavyskov/ssh:vavyskov-php-${PHP_VERSION}-apache-stretch
+##    build:
+##      context: ../docker-ssh/stretch
+##      args:
+##        SSH_PHP_FROM: ${PHP_FROM}
+##        SSH_COMPOSER_FROM: ${COMPOSER_FROM}
+#    environment:
+#      USER_NAME: ${USER_NAME}
+#      USER_PASSWORD: ${USER_PASSWORD}
+#      USER_GROUP: ${USER_GROUP}
+#      #USER_HOME: ${USER_HOME}
+#    networks:
+#      - backend
+#    ports:
+#      - "2202:22"
+#    volumes:
+#      - html:/var/www/html
+#      #- ./ssh:/data/.ssh:ro
+#      ## Uncomment next line if you're bringing your own sshd_config
+#      # - ./etc/ssh/sshd_config:/etc/ssh/sshd_config:ro
+#    #restart: on-failure:10
+#  samba:
+#    container_name: ${COMPOSE_PROJECT_NAME}_samba
+##    image: vavyskov/samba:alpine3.10
+##    image: vavyskov/samba:stretch
+#    build:
+#      context: ../docker-samba/stretch
+##      context: ../docker-samba/alpine3.10
+#    environment:
+#      USER_NAME: ${USER_NAME}
+#      USER_PASSWORD: ${USER_PASSWORD}
+#      USER_GROUP: ${USER_GROUP}
+#      #USER_HOME: ${USER_HOME}
+#    networks:
+#      - backend
+#    ports:
+#      - "445:445"
+#    volumes:
+#      - html:/var/www/html
 #  traefik:
 #    image: traefik
 #    command: -c /dev/null --web --docker --logLevel=INFO
@@ -136,6 +204,10 @@ services:
 #    ports:
 #      - 6666:8080
 #   restart: always
+
+#networks:
+#  backend:
+#  frontend:
 
 ## Persist data until you are not typing "docker-compose down -v"
 volumes:
